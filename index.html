@@ -1,149 +1,241 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diálogo ♥️ vs 🧠</title>
-    <style>
-        body {
-            background-color: black;
-            color: white;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        #chat-container {
-            width: 80%;
-            max-width: 500px;
-            height: 70vh;
-            overflow-y: auto;
-            border: 2px solid white;
-            padding: 20px;
-            border-radius: 10px;
-            background-color: rgba(255, 255, 255, 0.1);
-            display: none;
-            position: relative;
-        }
-        .message {
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 8px;
-            opacity: 0;
-            white-space: pre-wrap;
-        }
-        .heart { color: red; text-align: left; }
-        .brain { color: lightblue; text-align: right; }
-        .typing-indicator {
-            font-style: italic;
-            opacity: 0.7;
-            text-align: center;
-            display: none;
-            position: absolute;
-            bottom: 10px;
-            width: 100%;
-        }
-        #play {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: red;
-            color: white;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Regalo a distancia</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      padding: 40px 20px;
+    }
+
+    .sunflower {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      margin: 10px auto;
+      display: inline-block;
+    }
+
+    .petal {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background-color: yellow;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .petal:nth-child(1)  { top: 0%;   left: 50%; }
+    .petal:nth-child(2)  { top: 20%;  left: 85%; }
+    .petal:nth-child(3)  { top: 50%;  left: 100%; }
+    .petal:nth-child(4)  { top: 80%;  left: 85%; }
+    .petal:nth-child(5)  { top: 100%; left: 50%; }
+    .petal:nth-child(6)  { top: 80%;  left: 15%; }
+    .petal:nth-child(7)  { top: 50%;  left: 0%; }
+    .petal:nth-child(8)  { top: 20%;  left: 15%; }
+
+    .center {
+      width: 20px;
+      height: 20px;
+      background-color: brown;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+    }
+
+    button, input {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      margin: 10px;
+    }
+
+    #startBtn, #checkBtn {
+      background-color: yellow;
+      color: black;
+      cursor: pointer;
+    }
+
+    #inputSection {
+      display: none;
+      margin-top: 30px;
+    }
+
+    table {
+      margin: 30px auto;
+      border-collapse: collapse;
+      width: 80%;
+      max-width: 500px;
+    }
+
+    th, td {
+      border: 1px solid yellow;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    th {
+      background-color: yellow;
+      color: black;
+    }
+
+    .message {
+      margin-top: 30px;
+      font-size: 20px;
+      color: yellow;
+      animation: fadeIn 1s ease-in-out;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .flor-linea {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .flor-columna {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .izquierda { left: -80px; }
+    .derecha { right: -80px; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
 </head>
 <body>
 
-    <button id="play">Reproducir</button>
+  <h1>Regalo digital</h1>
+  <button id="startBtn">Dame clic</button>
 
-    <div id="chat-container">
-        <div id="messages"></div>
-        <div id="typing" class="typing-indicator">Escribiendo...</div>
-    </div>
+  <div id="inputSection">
+    <p>Ingresa tu nombre clave para ver tu mensaje:</p>
+    <input type="text" id="claveInput" placeholder="Ej. mami, Miriam...">
+    <button id="checkBtn">Descubre tu mensaje personalizado</button>
 
-    <script>
-        const messages = [
-            { text: "Oye, 🧠… ¿y si le mandamos un mensaje? Solo para saber cómo está.", icon: "❤️", class: "heart" },
-            { text: "No.", icon: "🧠", class: "brain" },
-            { text: "Pero la extraño…", icon: "❤️", class: "heart" },
-            { text: "Y yo también. Pero ella necesita su espacio.", icon: "🧠", class: "brain" },
-            { text: "¿Y si cree que ya no nos importa?", icon: "❤️", class: "heart" },
-            { text: "Sabe que nos importó. Pero insistir ahora solo la haría sentir presionada.", icon: "🧠", class: "brain" },
-            { text: "No quiero que piense que la olvidamos…", icon: "❤️", class: "heart" },
-            { text: "No la olvidamos, solo respetamos su proceso. No está lista, y lo mejor que podemos hacer es esperar sin interferir.", icon: "🧠", class: "brain" },
-            { text: "Duele callar…", icon: "❤️", class: "heart" },
-            { text: "Lo sé. Pero más dolería hacerle sentir que tiene que responder cuando aún no está preparada.", icon: "🧠", class: "brain" },
-            { text: "Entonces, ¿nos quedamos en silencio?", icon: "❤️", class: "heart" },
-            { text: "Sí, porque a veces, la mejor forma de demostrar amor es sabiendo cuándo dar espacio.", icon: "🧠", class: "brain" },
-            { text: "Pero…..¿Es lo mejor para nosotros?", icon: "❤️", class: "heart" },
-            { text: "¡No!, pero es lo mejor para ella y nosotros prometimos cuidarla y es la única forma.", icon: "🧠", class: "brain" },
-            { text: "Recuerda lo que una personita especial nos dijo una vez: 'El soltar también es amar.'", icon: "🧠", class: "brain" }
-        ];
+    <table>
+      <tr>
+        <th>Para</th>
+        <th>Nombre clave</th>
+      </tr>
+      <tr>
+        <td>Mi mamá</td>
+        <td>mami</td>
+      </tr>
+      <tr>
+        <td>Mi hermana</td>
+        <td>Miriam</td>
+      </tr>
+      <tr>
+        <td>Mi prima</td>
+        <td>clau</td>
+      </tr>
+      <tr>
+        <td>Para alguien especial</td>
+        <td>Alondra</td>
+      </tr>
+    </table>
 
-        let chatContainer = document.getElementById("chat-container");
-        let messagesDiv = document.getElementById("messages");
-        let typingIndicator = document.getElementById("typing");
-        let playButton = document.getElementById("play");
+    <div id="mensajePersonal" class="message"></div>
+  </div>
 
-        function showMessages() {
-            messagesDiv.innerHTML = "";
-            chatContainer.style.display = "block";
-            playButton.style.display = "none";
+  <script>
+    const startBtn = document.getElementById("startBtn");
+    const inputSection = document.getElementById("inputSection");
+    const checkBtn = document.getElementById("checkBtn");
+    const mensajePersonal = document.getElementById("mensajePersonal");
 
-            let index = 0;
+    startBtn.addEventListener("click", () => {
+      inputSection.style.display = "block";
+      startBtn.style.display = "none";
+    });
 
-            function typeMessage() {
-                if (index >= messages.length) return;
+    function crearFlor() {
+      return `
+        <div class="sunflower">
+          <div class="petal"></div>
+          <div class="petal"></div>
+          <div class="petal"></div>
+          <div class="petal"></div>
+          <div class="petal"></div>
+          <div class="petal"></div>
+          <div class="petal"></div>
+          <div class="petal"></div>
+          <div class="center"></div>
+        </div>
+      `;
+    }
 
-                let msg = messages[index];
-                typingIndicator.style.display = "block";
+    function floresEnLinea(cantidad = 3) {
+      return `<div class="flor-linea">` +
+        Array.from({ length: cantidad }, () => crearFlor()).join('') +
+        `</div>`;
+    }
 
-                setTimeout(() => {
-                    typingIndicator.style.display = "none";
+    function floresVerticales(clase) {
+      return `<div class="flor-columna ${clase}">` +
+        Array.from({ length: 3 }, () => crearFlor()).join('') +
+        `</div>`;
+    }
 
-                    let msgDiv = document.createElement("div");
-                    msgDiv.className = `message ${msg.class}`;
-                    messagesDiv.appendChild(msgDiv);
+    checkBtn.addEventListener("click", () => {
+      const clave = document.getElementById("claveInput").value.toLowerCase().trim();
+      let mensaje = "";
 
-                    let fullText = `${msg.icon} ${msg.text}`;
-                    let i = 0;
+      switch (clave) {
+        case "mami":
+          mensaje = "Gracias por ser el sol que siempre me acompaña y que se que cuando estoy trizte encuento consuelo en tí. Te amo mucho mamá.";
+          break;
+        case "miriam":
+          mensaje = "Eres la mejor hermana, un ejemplo y una compañera única. Gracias por todo.";
+          break;
+        case "clau":
+          mensaje = "Tu alegría ilumina nuestras reuniones, gracias por ser tú.";
+          break;
+        case "alondra":
+        case "monita":
+        case "tazo dorado":
+          mensaje = "Se que estamos lejos y no puedo verte, pero esto es para ti: Por no rendirte y seguir intentandolo y seguir luchando por tus sueños";
+          break;
+        default:
+          mensaje = "Esa persona no la conozco, pero igual te mando una flor imaginaria.";
+      }
 
-                    function typingEffect() {
-                        if (i < fullText.length) {
-                            msgDiv.innerHTML = fullText.substring(0, i + 1);
-                            i++;
-                            setTimeout(typingEffect, 50);
-                        } else {
-                            msgDiv.style.opacity = 1;
-                            chatContainer.scrollTop = chatContainer.scrollHeight; // Desplaza hacia abajo
-                            speakMessage(msg.icon + " " + msg.text, () => {
-                                index++; // Avanzamos al siguiente mensaje
-                                typeMessage();
-                            });
-                        }
-                    }
-                    typingEffect();
-                }, 1000); // Simula el tiempo de "escribiendo..."
-            }
-
-            function speakMessage(text, callback) {
-                let msg = new SpeechSynthesisUtterance(text);
-                msg.lang = "es-ES";
-                msg.onend = callback; // Espera a que termine de hablar antes de seguir
-                window.speechSynthesis.speak(msg);
-            }
-
-            typeMessage();
-        }
-
-        playButton.addEventListener("click", showMessages);
-    </script>
+      mensajePersonal.innerHTML = `
+  ${floresEnLinea()}
+  <div style="position: relative;">
+    ${floresVerticales("izquierda")}
+    <p>${mensaje}</p>
+    ${floresVerticales("derecha")}
+  </div>
+  ${floresEnLinea()}
+  <div style="margin-top: 20px;">
+    <p style="color: white; font-size: 18px;">Esto es para ti</p>
+    <img src="RamoFlores.png" alt="Flores para ti" style="max-width: 200px; margin-top: 10px;">
+  </div>
+`;
+    });
+  </script>
 
 </body>
 </html>
